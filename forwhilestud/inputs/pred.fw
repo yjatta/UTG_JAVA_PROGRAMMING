@@ -1,0 +1,5 @@
+# file pred.fw
+# function
+# returns the predecessor of x1
+x1 = x1 - 1
+

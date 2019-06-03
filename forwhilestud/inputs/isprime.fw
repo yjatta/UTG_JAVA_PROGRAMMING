@@ -1,0 +1,14 @@
+# file isprime.fw
+# predicate 
+# returns true if x1 is prime
+x3 = x1 -1;
+x4 = 0;
+x5 = 0;
+x6 = 2; 
+for x3 do
+  x4 = divides(x6,x1);
+  x5 = x5 + x4;
+  x6 = x6 + 1
+od;
+x2 = eq (x5,1);
+x1 = x2

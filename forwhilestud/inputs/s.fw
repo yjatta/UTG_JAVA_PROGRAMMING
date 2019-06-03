@@ -1,0 +1,4 @@
+# file s.fw
+# function
+# returns the successor of x1
+x1 = x1 + 1

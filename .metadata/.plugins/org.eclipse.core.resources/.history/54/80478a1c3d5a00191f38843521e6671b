@@ -1,0 +1,10 @@
+
+public class Tester {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		ArrayStudent3<Integer> arr= new ArrayStudent3<Integer>(20);
+System.out.println("Tesing");
+	}
+
+}

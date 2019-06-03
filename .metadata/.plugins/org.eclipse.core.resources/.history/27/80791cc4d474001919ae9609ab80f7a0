@@ -1,0 +1,9 @@
+package iterator;
+
+import java.util.Iterator;
+
+public class PreorderIterator implements Iterator<E> {
+
+	
+
+}

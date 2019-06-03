@@ -1,0 +1,23 @@
+
+public class Commission {
+	private double salesFigure;
+	private double commission_Rate;
+	private int commissionRate;
+	private double result;
+	private double Commission;
+	
+	
+	public void ComputeCommission(double SalesFigure, double CommissionRate) {
+		result= SalesFigure*CommissionRate;
+		System.out.println(result);
+	}
+	public void ComputeCommission(double SalesFigure, int CommissionRate) {
+		Commission=(commissionRate/100.0)*SalesFigure;
+		System.out.println(Commission);
+}
+	public static void main(String[] args) {
+		Commission fig=new Commission();
+		fig.ComputeCommission(7.0, 6.12);
+		fig.ComputeCommission(1.5, 1);
+	}
+}

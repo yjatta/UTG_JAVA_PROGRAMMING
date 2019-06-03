@@ -1,0 +1,239 @@
+/**
+  * mc is a small subset of c
+  * the grammar of mc is defined as follows:
+  *
+  * program                 ::= (variableDeclaration)* 
+  *                             (functionDeclaration)*
+  *                             (statement)* 
+  *                           ;  
+  * 
+  * variableDeclaration      ::= "int" <ID> ";" 
+  *                           ;
+  * 
+  * functionDeclaration      ::= "int" <ID> "(" funcParam ")" blockStatement 
+  *                           ;
+  *  
+  * parameterDeclaration     ::= ("int" <ID> ("," "int" <ID>)*)?
+  *                           ;
+  * 
+  * blockStatement           ::= "{" (varDeclaration)* (statement)* "}" 
+  *                           ;
+  * 
+  * statement                ::=   <ID> "=" addExpression ";" 
+  *                              | 
+  *                                whileStatement  
+  *                              | 
+  *                                ifStatement
+  *                              |
+  *                                "return" addExpression ";"
+  *                              |
+  *                                "print" "(" addExpression ")" ";"
+  *                              | 
+  *                               blockStatement
+  *                           ;
+  * 
+  * whileStatement           ::= "while" "(" orExpression ")" statement
+  *                           ;
+  * 
+  * ifStatement              ::= "if" "(" orExpression ")" statement
+  *                              ("else" statement)?
+  *                           ;
+  * 
+  * orExpression             ::= andExpression ("||" andExpression)*
+  *                           ;
+  * 
+  * andExpression            ::= relExpression ("&&" relExpression)*
+  *                           ;
+  * 
+  * relExpression            ::= addExpression
+  *                              (
+  *                               (">" | ">=" | "==" | "!=" | "<" | "<=")
+  *                               addExpression
+  *                              )?
+  *                           ;
+  * 
+  * addExpression            ::= mulExpression
+  *                              (("+" | "-") mulExpression)*
+  *                           ;
+  * 
+  * mulExpression            ::= negExpression
+  *                              (("*" | "/") negExpression)*
+  *                           ;
+  * 
+  * negExpression            ::= ("-" | "!")? priExpression
+  *              ;
+  * 
+  * priExpression            ::=   <INTEGER> 
+  *                              | 
+  *                                "(" orExpression ")" 
+  *                              | 
+  *                                <ID> ("(" (arguments)? ")")?
+  *                              ;
+  * 
+  * arguments                ::= orExpression ("," orExpression)*
+  *                           ;
+  */
+
+PARSER_BEGIN(NakedParser)
+
+package utg.mcc.parser;
+
+public class NakedParser {}
+
+PARSER_END(NakedParser)
+
+/* WHITE SPACE */
+
+SKIP :
+{
+  " " | "\t" | "\n" | "\r" | "\f" 
+}
+
+/* COMMENTS */
+
+SKIP :
+{
+  "//" : IN_SINGLE_LINE_COMMENT
+|
+  "/*" : IN_MULTI_LINE_COMMENT
+}
+
+<IN_SINGLE_LINE_COMMENT> SKIP :
+{
+  < "\n" | "\r" | "\r\n" > : DEFAULT
+}
+
+<IN_MULTI_LINE_COMMENT> SKIP :
+{
+  < "*/" > : DEFAULT
+}
+
+<IN_SINGLE_LINE_COMMENT,IN_MULTI_LINE_COMMENT> SKIP :
+{
+  < ~[] >
+}
+
+/* RESERVED WORDS AND LITERALS */
+
+TOKEN :
+{
+  < ELSE: "else" >
+| < IF: "if" >
+| < INT: "int" >
+| < WHILE: "while" >
+| < RETURN: "return" >
+| < PRINT: "print" >
+}
+
+/* LITERALS */
+
+TOKEN :
+{
+  < INTEGER: ["0"-"9"] (["0"-"9"])* >
+}
+
+/* IDENTIFIERS */
+
+TOKEN :
+{
+  < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* > 
+|
+  < #LETTER: ["a"-"z","A"-"Z","_"]>
+|
+  < #DIGIT: [ "0"-"9"] >
+}
+
+
+void program() :
+{}
+{   (LOOKAHEAD(3) variableDeclaration())*
+  (LOOKAHEAD(3) functionDeclaration())*
+  (statement())*
+}
+   
+void variableDeclaration() :
+{}
+{  "int" <IDENTIFIER> ";"
+} 
+void functionDeclaration() :
+{}
+{
+  "int" <IDENTIFIER> "(" parameterDeclarations() ")" blockStatement() 
+}
+
+void parameterDeclarations() :
+{}{  ("int" <IDENTIFIER> ("," "int" <IDENTIFIER>)*)?
+}
+
+void blockStatement() :  
+{}
+{
+  "{" variableDeclaration()* statement()* "}"
+}
+ 
+void statement() :
+{}
+{
+  <IDENTIFIER> "=" addExpression() ";" 
+| 
+  whileStatement()
+| 
+  ifStatement()
+|
+  "return" addExpression() ";"
+|
+  "print" "(" addExpression() ")" ";"
+| 
+  blockStatement()
+}
+ 
+void whileStatement() :
+{}{  "while" "(" orExpression() ")"
+  statement()
+}
+
+void ifStatement() :
+{}{  "if" "(" orExpression() ")"
+  statement()
+  ("else" statement())?
+}
+
+void orExpression() : 
+{}{  andExpression() ("||" andExpression())*
+}
+
+void andExpression() :
+{}{  relExpression() ("&&" relExpression())*
+}
+  
+void relExpression() :
+{}{  addExpression()
+  ((">" | ">=" | "==" | "!=" | "<" | "<=")
+  addExpression())?
+}
+
+void addExpression() :
+{}{  mulExpression() (("+" | "-") mulExpression())*
+}
+  
+void mulExpression() : 
+{}{  negExpression() (("*" | "/") negExpression())*
+}
+
+void negExpression() :
+{}{  ("-" | "!")? priExpression()
+}
+  
+void priExpression() :
+{}{  <INTEGER> 
+| 
+  "(" orExpression() ")" 
+| 
+  LOOKAHEAD(2) <IDENTIFIER>
+| 
+  LOOKAHEAD(2) <IDENTIFIER> "(" (arguments())? ")"
+}
+ 
+void arguments() :
+{}{  addExpression() ("," addExpression())*
+}

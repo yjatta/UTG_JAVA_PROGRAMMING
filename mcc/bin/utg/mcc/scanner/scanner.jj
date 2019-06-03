@@ -1,0 +1,174 @@
+/**
+  * mcc is a small subset of c
+  * the grammar of mcc is defined as follows:
+  *
+  * mccProg     ::= (varDec)* 
+  *                 (funcDec)*
+  *                 (stat)* 
+  *              ;  
+  * 
+  * varDec      ::= "int" <ID> ";" 
+  *              ;
+  * 
+  * funcDec     ::= "int" <ID> "(" funcParam ")" block 
+  *              ;
+  * 
+  * funcParam   ::= ("int" <ID> ("," "int" <ID>)*)?
+  *              ;
+  * 
+  * block       ::= "{" (varDec)* (stat)* "}" 
+  *              ;
+  * 
+  * stat        ::=   <ID> "=" orExp ";" 
+  *                 | 
+  *                   whileStat  
+  *                 | 
+  *                   ifStat
+  *                 |
+  *                   "return" orExpr ";"
+  *                 |
+  *                   "print" "(" orExpr ")" ";"
+  *                 | 
+  *                   block
+  *              ;
+  * 
+  * whileStat   ::= "while" "(" orExp ")" stat
+  *              ;
+  * 
+  * ifStat      ::= "if" "(" orExp ")" stat ("else" stat)?
+  *              ;
+  * 
+  * orExp       ::= andExp ("||" andExp)*
+  *              ;
+  * 
+  * andExp      ::= relExp ("&&" relExp)*
+  *              ;
+  * 
+  * relExp      ::= addExpr ((">" | ">=" | "==" | "!=" | "<" | "<=") addexpr)?
+  *              ;
+  * 
+  * addExp      ::= mulExpr (("+" | "-") mulExpr)*
+  *              ;
+  * 
+  * mulExp      ::= negExpr (("*" | "/") negExpr)*
+  *              ;
+  * 
+  * negExp      ::= ("-" | "!")? priExp
+  *              ;
+  * 
+  * priExp      ::=   <INTEGER> 
+  *                 | 
+  *                   "(" orExp ")" 
+  *                 | 
+  *                   <ID> ("(" (funArgs)? ")")?
+  *              ;
+  * 
+  * funArgs     ::= orExp ("," orExp)*
+  *              ;
+  */
+
+PARSER_BEGIN(Scanner)
+
+package utg.mcc.scanner;
+
+public class Scanner {}
+
+PARSER_END(Scanner)
+
+/* WHITE SPACE */
+
+SKIP :
+{
+  " " | "\t" | "\n" | "\r" | "\f"
+}
+
+/* COMMENTS */
+
+SKIP :
+{
+  "//" : IN_SINGLE_LINE_COMMENT
+|
+  "/*" : IN_MULTI_LINE_COMMENT
+}
+
+<IN_SINGLE_LINE_COMMENT> SKIP :
+{
+  < "\n" | "\r" | "\r\n" > : DEFAULT
+}
+
+<IN_FORMAL_COMMENT> SKIP :
+{
+  < "*/" > : DEFAULT
+}
+
+<IN_MULTI_LINE_COMMENT> SKIP :
+{
+  < "*/" > : DEFAULT
+}
+
+<IN_SINGLE_LINE_COMMENT,IN_MULTI_LINE_COMMENT> SKIP :
+{
+  < ~[] >
+}
+
+/* RESERVED WORDS AND LITERALS */
+
+TOKEN :
+{
+  < ELSE: "else" >
+| < IF: "if" >
+| < INT: "int" >
+| < WHILE: "while" >
+| < RETURN: "return" >
+| < PRINT: "print" >
+}
+
+/* LITERALS */
+
+TOKEN :
+{
+  < INTEGER: ["0"-"9"] (["0"-"9"])* >
+}
+
+/* IDENTIFIERS */
+
+TOKEN :
+{
+  < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* > 
+|
+  < #LETTER: ["a"-"z","A"-"Z","_"]>
+|
+  < #DIGIT: [ "0"-"9"] >
+}
+
+/* SEPARATORS */
+
+TOKEN :
+{
+  < LPAREN: "(" >
+| < RPAREN: ")" >
+| < LBRACE: "{" >
+| < RBRACE: "}" > 
+| < SEMICOLON: ";" >
+| < COMMA: "," >
+}
+
+/* OPERATORS */
+
+TOKEN :
+{
+  < ASSIGN: "=" >
+| < GT: ">" >
+| < LT: "<" >
+| < EQ: "==" >
+| < LE: "<=" >
+| < GE: ">=" >
+| < NE: "!=" >
+| < ADD: "+" >
+| < SUB: "-" >
+| < MUL: "*" >
+| < DIV: "/" >
+| < OR: "||" >
+| < AND: "&&" >
+| < NOT: "!" >
+}

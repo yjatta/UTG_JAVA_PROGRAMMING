@@ -1,0 +1,43 @@
+/**
+ * JavaCC file
+ */
+ 
+options {
+  JDK_VERSION = "1.6";
+  STATIC = false;
+}
+PARSER_BEGIN(Scanner)
+package gm.utg.fw.scanner;
+
+public class Scanner { 
+}
+PARSER_END(Scanner) 
+
+SKIP :
+{
+ 	" "
+|	"\r"
+|	"\t"
+|	"\n"  
+|   <COMMENT: "#" (~["\n","\r"])* ("\n"|"\r"|"\r\n") >
+}
+
+TOKEN :
+{
+  < ID: "x" (["0"-"9"])+ >
+| < NUM: (["0"-"9"])+ >    
+| < NEQ: "!=" >
+| < SET: "=" >
+| < PLUS: "+" >
+| < MINUS: "-" >
+| < END: ";" >	
+| < WHILE: "while" >	
+| < FOR: "for" >
+| < DO: "do" >	
+| < OD: "od" >        
+| < QUIT: "quit" >  
+| < FUNC: (["a"-"z"])+ >  
+| < LPAR: "(" >
+| < RPAR: ")" >
+| < COMMA: "," >    
+}

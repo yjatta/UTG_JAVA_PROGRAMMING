@@ -1,0 +1,24 @@
+package alieuCeesay;
+
+public class Past {
+	public static int sumDigit(int n) {
+		
+		if(n <= 0) {
+			return n; 
+		}
+		return n%10 + sumDigit((int)n/10);
+	}
+	
+	public static int getcomputedTax() {
+		int result = getcomputedTax();
+		return result;
+	}
+//	123
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		
+		System.out.println(sumDigit(1234));
+		
+	}
+
+}

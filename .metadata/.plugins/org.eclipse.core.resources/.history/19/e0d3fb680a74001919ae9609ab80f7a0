@@ -1,0 +1,284 @@
+
+package iterator;
+
+import java.util.Iterator;
+import java.util.Stack;
+
+
+public class Tree<E> {
+	
+
+		  private Position<E> root;
+
+		  public Tree() {
+		    this.root = null;
+		  }
+
+		  private class Node<E> implements Position<E> {
+		    private E element;
+		    private Position<E> parent = null;
+		    private Position<E> left = null;
+		    private Position<E> right = null;
+
+		    public Node() {
+		    }
+
+		    public Node(E element, Position<E> parent, Position<E> left,
+		        Position<E> right) {
+		      this.element = element;
+		      this.parent = parent;
+		      this.left = left;
+		      this.right = right;
+		    }
+
+		    @Override
+		    public E getElement() {
+		      return element;
+		    }
+
+		    @Override
+		    public void setElement(E element) {
+		      this.element = element;
+		    }
+
+		    @Override
+		    public Position<E> getParent() {
+		      return parent;
+		    }
+
+		    @Override
+		    public void setParent(Position<E> parent) {
+		      this.parent = parent;
+		    }
+
+		    @Override
+		    public Position<E> getLeft() {
+		      return left;
+		    }
+
+		    @Override
+		    public void setLeft(Position<E> left) {
+		      this.left = left;
+		      left.setParent(this);
+		    }
+
+		    @Override
+		    public Position<E> getRight() {
+		      return right;
+		    }
+
+		    @Override
+		    public void setRight(Position<E> right) {
+		      this.right = right;
+		      right.setParent(this);
+		    }
+		  }
+
+		  public boolean isEmpty() {
+		    return root == null;
+		  }
+
+		  public Position<E> getRoot() throws EmptyTreeException {
+		    return root;
+		  }
+
+		  public void SetRoot(Position<E> position) throws EmptyTreeException {
+		    root = position;
+		  }
+
+		  public Position<E> getLeft(Position<E> position) {
+		    return position.getLeft();
+		  }
+
+		  public void setLeft(Position<E> position, Position<E> left) {
+		    position.setLeft(left);
+		  }
+
+		  public Position<E> getRight(Position<E> position) {
+		    return position.getRight();
+		  }
+
+		  public void setRight(Position<E> position, Position<E> right) {
+		    position.setRight(right);
+		  }
+
+		  public Position<E> getParent(Position<E> position)
+		      throws InvalidPositionException {
+		    if (position == null) {
+		      throw new InvalidPositionException("null position");
+		    }
+		    return position.getParent();
+		  }
+
+		  public void setParent(Position<E> position, Position<E> parent) {
+		    position.setParent(parent);
+		  }
+
+		  public Position<E> makePosition() {
+		    return new Node<E>();
+		  }
+
+		  public Position<E> makePosition(E element) {
+		    return new Node<E>(element, null, null, null);
+		  }
+
+		  public Position<E> makePosition(E element, Position<E> parent,
+		      Position<E> left, Position<E> right) {
+		    return new Node<E>(element, parent, left, right);
+		  }
+
+		  private class PreorderTreeIteratorWithStack implements Iterator<E> {
+
+		    // Alternative Variante ohne Stack
+		    // Der erste besuchte Knoten ist die Wurzel
+		    // Für das Weiterschalten müssen wir wieder mehrere Fälle unterscheiden:
+		    // 1. Wenn der aktuelle Knoten einen linken Sohn hat,
+		    // ist dieser der nächste Knoten.
+		    // 2. Wenn der aktuelle Knoten keinen linken Sohn hat,
+		    // ist die rechte Tochter der nächste Knoten, falls
+		    // eine solche existiert.
+		    // 3. Wenn der aktuelle Knoten keine Kinder hat, er also
+		    // ein Blatt ist, suchen wir aufsteigend den nächsten
+		    // Ahnen, der einen noch nicht besuchten rechten Sohn hat.
+		    private final Stack<Position<E>> s = new Stack<Position<E>>();
+
+		    PreorderTreeIteratorWithStack() {
+		      s.push(root);
+		    }
+
+		    @Override
+		    public boolean hasNext() {
+		      return !s.isEmpty();
+		    }
+
+		    @Override
+		    public E next() {
+		      Position<E> next = s.pop();
+		      if (next.getRight() != null) {
+		        s.push(next.getRight());
+		      }
+		      if (next.getLeft() != null) {
+		        s.push(next.getLeft());
+		      }
+		      return next.getElement();
+		    }
+		  }
+
+		  public Iterator<E> preorderIteratorWithStack() {
+		    return new PreorderTreeIteratorWithStack();
+		  }
+
+		  private class PreorderTreeIteratorNoStack implements Iterator<E> {
+
+
+		    // Der erste Knoten ist das am weitesten links liegende Blatt
+		    // Für das Weiterschalten gilt:
+		    // 1. Wenn der aktuelle Knoten ein linker Sohn ist,
+		    // ist der nächste der linkste Nachkomme seiner rechten
+		    // Schwester, falls diese existiert, sonst der Vater.
+		    // 2. Wenn der aktuelle Knoten ein rechter Sohn ist, ist
+		    // der nächste sein Vater.
+		    // 3. Wenn es keinen Vater mehr gibt, der aktuelle Knoten
+		    // also die Wurzel ist, sind wir fertig.
+
+
+		    private Position<E> current;
+
+		    PreorderTreeIteratorNoStack() {
+		      current = root;
+		    }
+
+		    @Override
+		    public boolean hasNext() {
+		      return current != null;
+		    }
+
+		    @Override
+		    public E next() {
+		      Position<E> result = current;
+		      if (current.getLeft() != null) {
+		        current = current.getLeft();
+		      } else if (current.getRight() != null) {
+		        current = current.getRight();
+		      } else {
+		        Position<E> p = current.getParent();
+		        Position<E> c = current;
+		        while (p != null && (p.getRight() == c || p.getRight() == null)) {
+		          c = p;
+		          p = p.getParent();
+		        }
+		        if (p == null) {
+		          current = null;
+		        } else {
+		          current = p.getRight();
+		        }
+		      }
+		      return result.getElement();
+		    }
+
+		    @Override
+		    public void remove() {
+		    }
+		  }
+
+		  public Iterator<E> preorderIteratorNoStack() {
+		    return new PreorderTreeIteratorNoStack();
+		  }
+
+
+		  private class PostorderTreeIteratorWithStack implements Iterator<E> {
+		    private final Stack<Position<E>> s = new Stack<Position<E>>();
+
+		    PostorderTreeIteratorWithStack() {
+		    }
+
+		    @Override
+		    public boolean hasNext() {
+		      // ADD your code here
+		     //  
+		      return false;
+		    }
+
+		    @Override
+		    public E next() {
+		      // ADD your code here
+		      return null;
+		    }
+
+		    @Override
+		    public void remove() {
+		      // LEAVE empty
+		    }
+		  }
+
+		  public Iterator<E> postorderIteratorWithStack() {
+		    return new PostorderTreeIteratorWithStack();
+		  }
+
+		  private class PostorderTreeIteratorNoStack implements Iterator<E> {
+
+		    PostorderTreeIteratorNoStack() {
+		    }
+
+		    @Override
+		    public boolean hasNext() {
+		      // ADD your code here
+		      return false;
+		    }
+
+		    @Override
+		    public E next() {
+		      // ADD your code here
+		      return null;
+		    }
+
+		    @Override
+		    public void remove() {
+		      // LEAVE empty
+		    }
+		  }
+
+		  public Iterator<E> postorderIteratorNoStack(){
+		    return new PostorderTreeIteratorNoStack();
+		  }
+}

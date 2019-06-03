@@ -1,0 +1,8 @@
+# file mul..fw
+# function
+# returns x1 * x2
+x3 = 0;
+for x1 do
+  x3 = x3 + x2
+od;
+x1 = x3
